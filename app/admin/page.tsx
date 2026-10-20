@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Users, DollarSign, FileText, Globe, Plus, Trash2, Edit3, Save, ArrowLeft, Package, Loader2, X, Upload, MessageSquare, Phone, Mail, Clock, Layers, Lock, Sparkles, Check } from 'lucide-react';
+import { Users, DollarSign, FileText, Globe, Plus, Trash2, Edit3, Save, ArrowLeft, Package, Loader2, X, Upload, MessageSquare, Phone, Mail, Clock, Layers, Lock, Sparkles, Check, Menu } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function VannaOSMasterHubSpot() {
@@ -14,6 +14,9 @@ export default function VannaOSMasterHubSpot() {
   const [selectedCompany, setSelectedCompany] = useState<any | null>(null);
   const [isEditingCompany, setIsEditingCompany] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Mobile Burger Menu State
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Modal States
   const [isDealModalOpen, setIsDealModalOpen] = useState(false);
@@ -187,7 +190,6 @@ export default function VannaOSMasterHubSpot() {
     }
   };
 
-  // Add or Update Product with Feature Ticks
   const handleSaveProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProd.name || !newProd.mrr) {
@@ -249,7 +251,6 @@ export default function VannaOSMasterHubSpot() {
     }
   };
 
-  // Add Deal
   const handleAddDealSubmit = async (e: React.FormEvent, targetCompanyId?: number) => {
     e.preventDefault();
     
@@ -430,309 +431,392 @@ export default function VannaOSMasterHubSpot() {
     );
   }
 
+  const navItems = [
+    { id: 'pipeline', label: 'Pipeline & Deals', icon: Plus },
+    { id: 'contacts', label: 'Company CRM Directory', icon: Users },
+    { id: 'products', label: 'Products & Pricing Catalog', icon: Package },
+    { id: 'cms', label: 'Global Website CMS', icon: Globe },
+    { id: 'finances', label: 'MRR & Reports', icon: DollarSign },
+    { id: 'contracts', label: 'Contracts & SLA Vault', icon: FileText },
+  ];
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F7F4EF', color: '#2C221E', fontFamily: 'system-ui, sans-serif', position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#F7F4EF', color: '#2C221E', fontFamily: 'system-ui, sans-serif', position: 'relative' }}>
       
-      {/* Sidebar Navigation */}
-      <aside style={{ width: '280px', background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', borderRight: '1px solid #E6E0D8', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'sticky', top: 0, height: '100vh' }} className="hidden md:flex">
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '2.5rem' }}>
-            <span style={{ fontSize: '1.8rem', fontWeight: 350, letterSpacing: '0.05em' }}>vanna</span>
-            <span style={{ fontSize: '9px', background: '#C88A65', color: 'white', padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.1em' }}>OS</span>
-          </div>
-
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {[
-              { id: 'pipeline', label: 'Pipeline & Deals', icon: Plus },
-              { id: 'contacts', label: 'Company CRM Directory', icon: Users },
-              { id: 'products', label: 'Products & Pricing Catalog', icon: Package },
-              { id: 'cms', label: 'Global Website CMS', icon: Globe },
-              { id: 'finances', label: 'MRR & Reports', icon: DollarSign },
-              { id: 'contracts', label: 'Contracts & SLA Vault', icon: FileText },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = currentTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => { setActiveTab(tab.id as any); setSelectedCompany(null); setIsEditingCompany(false); }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    width: '100%',
-                    padding: '12px 16px',
-                    borderRadius: '1rem',
-                    border: 'none',
-                    background: isActive ? '#2C221E' : 'transparent',
-                    color: isActive ? '#FFFFFF' : '#2C221E',
-                    fontSize: '0.8rem',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: isActive ? '0 4px 12px rgba(44,34,30,0.1)' : 'none'
-                  }}
-                >
-                  <Icon size={16} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+      {/* Mobile Top Navbar with Burger Menu */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #E6E0D8', position: 'sticky', top: 0, zIndex: 100 }} className="flex md:hidden">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '1.4rem', fontWeight: 350, letterSpacing: '0.05em' }}>vanna</span>
+          <span style={{ fontSize: '8px', background: '#C88A65', color: 'white', padding: '2px 6px', borderRadius: '999px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.1em' }}>OS Hub</span>
         </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          style={{ background: '#2C221E', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+        >
+          {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />} Menu
+        </button>
+      </header>
 
-        <div className="card-box" style={{ margin: 0, padding: '1.25rem', background: '#FFFFFF' }}>
-          <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Active Portfolio MRR</span>
-          <span style={{ fontSize: '1.5rem', fontWeight: 300 }}>£{activePortfolioMrr} <span style={{ fontSize: '0.75rem', color: '#2C221E60' }}>/mo</span></span>
-          <span style={{ fontSize: '10px', color: '#2C221E60', display: 'block', marginTop: '2px' }}>({activeCustomerDeals.length} active customer deals)</span>
+      {/* Mobile Burger Menu Dropdown Drawer */}
+      {isMobileMenuOpen && (
+        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E6E0D8', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '6px', position: 'sticky', top: '61px', zIndex: 99, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} className="flex md:hidden">
+          {navItems.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = currentTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => { setActiveTab(tab.id as any); setSelectedCompany(null); setIsEditingCompany(false); setIsMobileMenuOpen(false); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '10px 14px', borderRadius: '8px',
+                  border: 'none', background: isActive ? '#2C221E' : '#F7F4EF', color: isActive ? '#FFFFFF' : '#2C221E',
+                  fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer'
+                }}
+              >
+                <Icon size={16} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
-      </aside>
+      )}
 
-      {/* Main Workspace */}
-      <main style={{ flex: 1, padding: '2.5rem', maxWidth: '1320px', margin: '0 auto', overflowY: 'auto' }}>
-        
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #E6E0D8' }}>
+      <div style={{ display: 'flex', flex: 1, width: '100%' }}>
+        {/* Desktop Sidebar Navigation */}
+        <aside style={{ width: '280px', background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', borderRight: '1px solid #E6E0D8', padding: '2rem', display: 'none', flexDirection: 'column', justifyContent: 'space-between', position: 'sticky', top: 0, height: '100vh', flexShrink: 0 }} className="md:flex">
           <div>
-            <h1 style={{ fontSize: '2rem', fontWeight: 300, textTransform: 'capitalize', margin: 0 }}>
-              {selectedCompany ? `Company Profile: ${selectedCompany.business_name}` : currentTab.replace('-', ' ')}
-            </h1>
-            <p style={{ fontSize: '0.8rem', color: '#2C221E70', margin: '4px 0 0 0' }}>Multi-Deal HubSpot CRM Architecture</p>
-          </div>
-          
-          <div style={{ display: 'flex', gap: '10px' }}>
-            {currentTab === 'pipeline' && !selectedCompany && (
-              <button 
-                onClick={() => setIsDealModalOpen(true)}
-                style={{ background: '#2C221E', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                <Plus size={16} /> Add New Deal
-              </button>
-            )}
-            {currentTab === 'contracts' && !selectedCompany && (
-              <button 
-                onClick={() => setIsContractModalOpen(true)}
-                style={{ background: '#2C221E', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                <Upload size={16} /> Upload Contract
-              </button>
-            )}
-          </div>
-        </header>
-
-        {/* COMPANY PROFILE & MULTI-DEAL HUB VIEW */}
-        {selectedCompany ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button 
-                onClick={() => { setSelectedCompany(null); setIsEditingCompany(false); }} 
-                style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 600, color: '#C88A65', padding: 0 }}
-              >
-                <ArrowLeft size={16} /> Back to Directory
-              </button>
-
-              <button 
-                onClick={() => setIsEditingCompany(!isEditingCompany)} 
-                style={{ background: '#2C221E', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-              >
-                <Edit3 size={14} /> {isEditingCompany ? 'Cancel Editing' : 'Edit Company'}
-              </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '2.5rem' }}>
+              <span style={{ fontSize: '1.8rem', fontWeight: 350, letterSpacing: '0.05em' }}>vanna</span>
+              <span style={{ fontSize: '9px', background: '#C88A65', color: 'white', padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.1em' }}>OS</span>
             </div>
 
-            {isEditingCompany ? (
-              <form onSubmit={handleSaveCompanyEdit} className="card-box" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-                <div>
-                  <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Business Name</label>
-                  <input type="text" value={selectedCompany.business_name} onChange={e => setSelectedCompany({...selectedCompany, business_name: e.target.value})} required />
-                </div>
-                <div>
-                  <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Contact Person</label>
-                  <input type="text" value={selectedCompany.contact_name} onChange={e => setSelectedCompany({...selectedCompany, contact_name: e.target.value})} required />
-                </div>
-                <div>
-                  <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Email</label>
-                  <input type="email" value={selectedCompany.email} onChange={e => setSelectedCompany({...selectedCompany, email: e.target.value})} />
-                </div>
-                <div>
-                  <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Phone</label>
-                  <input type="text" value={selectedCompany.phone} onChange={e => setSelectedCompany({...selectedCompany, phone: e.target.value})} />
-                </div>
-                <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-                  <button type="submit" style={{ background: '#047857', color: 'white', border: 'none', padding: '0.75rem 2rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Save size={16} /> Save Company Details
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {navItems.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = currentTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => { setActiveTab(tab.id as any); setSelectedCompany(null); setIsEditingCompany(false); }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '1rem',
+                      border: 'none',
+                      background: isActive ? '#2C221E' : 'transparent',
+                      color: isActive ? '#FFFFFF' : '#2C221E',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: isActive ? '0 4px 12px rgba(44,34,30,0.1)' : 'none'
+                    }}
+                  >
+                    <Icon size={16} />
+                    <span>{tab.label}</span>
                   </button>
-                </div>
-              </form>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <div className="card-box" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-                  <div>
-                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65' }}>Company Profile</span>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 400, margin: '4px 0 1rem 0' }}>{selectedCompany.business_name}</h2>
-                    <div style={{ fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px', color: '#2C221E80' }}>
-                      <p style={{ margin: 0 }}><strong>Owner/Contact:</strong> {selectedCompany.contact_name}</p>
-                      <p style={{ margin: 0 }}><strong>Email:</strong> {selectedCompany.email}</p>
-                      <p style={{ margin: 0 }}><strong>Phone:</strong> {selectedCompany.phone}</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65' }}>Associated Deals Hub ({deals.filter(d => d.company_id === selectedCompany.id).length})</span>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-                      {deals.filter(d => d.company_id === selectedCompany.id).map(deal => (
-                        <div key={deal.id} style={{ background: '#F7F4EF', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E6E0D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block' }}>{deal.deal_name}</span>
-                            <span style={{ fontSize: '7px', color: '#C88A65', background: '#C88A6515', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>{deal.stage}</span>
-                          </div>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#047857' }}>£{deal.mrr_value}/mo</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Associated Deals & Add Deal Button */}
-                <div className="card-box">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Layers size={16} /> Deals & Renewals for {selectedCompany.business_name}
-                    </h3>
-                    <button 
-                      onClick={() => {
-                        setDealForm(prev => ({ ...prev, company_id: selectedCompany.id, new_business_name: selectedCompany.business_name }));
-                        setIsDealModalOpen(true);
-                      }}
-                      style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-                    >
-                      <Plus size={14} /> Add Deal / Renewal
-                    </button>
-                  </div>
-
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
-                    <thead>
-                      <tr style={{ background: '#F2ECE4', color: '#2C221E70', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em' }}>
-                        <th style={{ padding: '0.75rem 1rem' }}>Deal Name</th>
-                        <th style={{ padding: '0.75rem 1rem' }}>Stage</th>
-                        <th style={{ padding: '0.75rem 1rem' }}>Tier</th>
-                        <th style={{ padding: '0.75rem 1rem' }}>MRR</th>
-                        <th style={{ padding: '0.75rem 1rem' }}>Setup</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {deals.filter(d => d.company_id === selectedCompany.id).map(d => (
-                        <tr key={d.id} style={{ borderTop: '1px solid #E6E0D8' }}>
-                          <td style={{ padding: '1rem', fontWeight: 500 }}>{d.deal_name}</td>
-                          <td style={{ padding: '1rem' }}><span style={{ color: '#C88A65', fontWeight: 600 }}>{d.stage}</span></td>
-                          <td style={{ padding: '1rem', color: '#2C221E70' }}>{d.product_tier}</td>
-                          <td style={{ padding: '1rem', fontWeight: 600, color: '#047857' }}>£{d.mrr_value}/mo</td>
-                          <td style={{ padding: '1rem' }}>£{d.setup_value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Communication Notes & Documents */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                  <div className="card-box" style={{ margin: 0 }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <MessageSquare size={16} /> Communication Logs
-                    </h3>
-                    <form onSubmit={handleAddNote} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '1rem' }}>
-                      <select value={newNote.communication_type} onChange={e => setNewNote({...newNote, communication_type: e.target.value})}>
-                        <option value="Call">Call</option>
-                        <option value="Missed Call">Missed Call</option>
-                        <option value="Email">Email</option>
-                        <option value="WhatsApp">WhatsApp</option>
-                      </select>
-                      <textarea rows={2} placeholder="Write note..." value={newNote.content} onChange={e => setNewNote({...newNote, content: e.target.value})} required style={{ background: '#F7F4EF' }} />
-                      <button type="submit" style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', alignSelf: 'flex-end' }}>Add Note</button>
-                    </form>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      {notes.filter(n => n.company_id === selectedCompany.id).map(n => (
-                        <div key={n.id} style={{ background: '#F7F4EF', padding: '8px 10px', borderRadius: '6px', fontSize: '0.75rem' }}>
-                          <strong>{n.communication_type}</strong> ({n.date}): {n.content}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="card-box" style={{ margin: 0 }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <FileText size={16} /> Associated Documents
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {documents.filter(d => d.company_name === selectedCompany.business_name).map(doc => (
-                        <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 10px', background: '#F7F4EF', borderRadius: '6px', fontSize: '0.75rem' }}>
-                          <span>{doc.title}</span>
-                          <button onClick={() => handleDeleteDoc(doc.id)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '2px 6px', borderRadius: '4px', fontSize: '10px' }}>Delete</button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            )}
+                );
+              })}
+            </nav>
           </div>
-        ) : (
-          <>
-            {/* TAB 1: PIPELINE */}
-            {currentTab === 'pipeline' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                <div className="card-box" style={{ padding: '1.5rem' }}>
-                  <h3 style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, margin: '0 0 1rem 0' }}>Pipeline Revenue by Stage</h3>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '10px' }}>
-                    {pipelineStages.map(stage => {
-                      const stageDeals = deals.filter(d => (d.stage || 'Prospect') === stage);
-                      const stageMrr = stageDeals.reduce((acc, d) => acc + Number(d.mrr_value || 0), 0);
-                      return (
-                        <div key={stage} style={{ background: '#F7F4EF', padding: '10px', borderRadius: '10px', textAlign: 'center', border: '1px solid #E6E0D8' }}>
-                          <span style={{ fontSize: '9px', textTransform: 'uppercase', color: '#2C221E60', fontWeight: 600, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stage}</span>
-                          <span style={{ fontSize: '1rem', fontWeight: 600, display: 'block', margin: '4px 0 2px 0' }}>£{stageMrr}</span>
-                          <span style={{ fontSize: '10px', color: '#C88A65' }}>{stageDeals.length} deals</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
 
-                <div className="card-box" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #E6E0D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0 }}>Active Pipeline & Customer Deals ({deals.length})</h3>
-                    <button onClick={() => setIsDealModalOpen(true)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer' }}>
-                      Add New Deal
+          <div className="card-box" style={{ margin: 0, padding: '1.25rem', background: '#FFFFFF' }}>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Active Portfolio MRR</span>
+            <span style={{ fontSize: '1.5rem', fontWeight: 300 }}>£{activePortfolioMrr} <span style={{ fontSize: '0.75rem', color: '#2C221E60' }}>/mo</span></span>
+            <span style={{ fontSize: '10px', color: '#2C221E60', display: 'block', marginTop: '2px' }}>({activeCustomerDeals.length} active customer deals)</span>
+          </div>
+        </aside>
+
+        {/* Main Workspace */}
+        <main style={{ flex: 1, padding: 'clamp(1rem, 3vw, 2.5rem)', maxWidth: '1320px', margin: '0 auto', overflowY: 'auto', width: '100%' }}>
+          
+          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1.25rem', borderBottom: '1px solid #E6E0D8', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 300, textTransform: 'capitalize', margin: 0 }}>
+                {selectedCompany ? `Company Profile: ${selectedCompany.business_name}` : currentTab.replace('-', ' ')}
+              </h1>
+              <p style={{ fontSize: '0.8rem', color: '#2C221E70', margin: '4px 0 0 0' }}>Multi-Deal HubSpot CRM Architecture</p>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {currentTab === 'pipeline' && !selectedCompany && (
+                <button 
+                  onClick={() => setIsDealModalOpen(true)}
+                  style={{ background: '#2C221E', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <Plus size={16} /> Add New Deal
+                </button>
+              )}
+              {currentTab === 'contracts' && !selectedCompany && (
+                <button 
+                  onClick={() => setIsContractModalOpen(true)}
+                  style={{ background: '#2C221E', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <Upload size={16} /> Upload Contract
+                </button>
+              )}
+            </div>
+          </header>
+
+          {/* COMPANY PROFILE & MULTI-DEAL HUB VIEW */}
+          {selectedCompany ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <button 
+                  onClick={() => { setSelectedCompany(null); setIsEditingCompany(false); }} 
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 600, color: '#C88A65', padding: 0 }}
+                >
+                  <ArrowLeft size={16} /> Back to Directory
+                </button>
+
+                <button 
+                  onClick={() => setIsEditingCompany(!isEditingCompany)} 
+                  style={{ background: '#2C221E', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Edit3 size={14} /> {isEditingCompany ? 'Cancel Editing' : 'Edit Company'}
+                </button>
+              </div>
+
+              {isEditingCompany ? (
+                <form onSubmit={handleSaveCompanyEdit} className="card-box" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                  <div>
+                    <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Business Name</label>
+                    <input type="text" value={selectedCompany.business_name} onChange={e => setSelectedCompany({...selectedCompany, business_name: e.target.value})} required />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Contact Person</label>
+                    <input type="text" value={selectedCompany.contact_name} onChange={e => setSelectedCompany({...selectedCompany, contact_name: e.target.value})} required />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Email</label>
+                    <input type="email" value={selectedCompany.email} onChange={e => setSelectedCompany({...selectedCompany, email: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Phone</label>
+                    <input type="text" value={selectedCompany.phone} onChange={e => setSelectedCompany({...selectedCompany, phone: e.target.value})} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+                    <button type="submit" style={{ background: '#047857', color: 'white', border: 'none', padding: '0.75rem 2rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Save size={16} /> Save Company Details
                     </button>
                   </div>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
+                </form>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  <div className="card-box" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                    <div>
+                      <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65' }}>Company Profile</span>
+                      <h2 style={{ fontSize: '1.5rem', fontWeight: 400, margin: '4px 0 1rem 0' }}>{selectedCompany.business_name}</h2>
+                      <div style={{ fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px', color: '#2C221E80' }}>
+                        <p style={{ margin: 0 }}><strong>Owner/Contact:</strong> {selectedCompany.contact_name}</p>
+                        <p style={{ margin: 0 }}><strong>Email:</strong> {selectedCompany.email}</p>
+                        <p style={{ margin: 0 }}><strong>Phone:</strong> {selectedCompany.phone}</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65' }}>Associated Deals Hub ({deals.filter(d => d.company_id === selectedCompany.id).length})</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                        {deals.filter(d => d.company_id === selectedCompany.id).map(deal => (
+                          <div key={deal.id} style={{ background: '#F7F4EF', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E6E0D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                              <span style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block' }}>{deal.deal_name}</span>
+                              <span style={{ fontSize: '7px', color: '#C88A65', background: '#C88A6515', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>{deal.stage}</span>
+                            </div>
+                            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#047857' }}>£{deal.mrr_value}/mo</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Associated Deals & Add Deal Button */}
+                  <div className="card-box" style={{ overflowX: 'auto' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '8px' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Layers size={16} /> Deals & Renewals for {selectedCompany.business_name}
+                      </h3>
+                      <button 
+                        onClick={() => {
+                          setDealForm(prev => ({ ...prev, company_id: selectedCompany.id, new_business_name: selectedCompany.business_name }));
+                          setIsDealModalOpen(true);
+                        }}
+                        style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      >
+                        <Plus size={14} /> Add Deal / Renewal
+                      </button>
+                    </div>
+
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem', minWidth: '480px' }}>
+                      <thead>
+                        <tr style={{ background: '#F2ECE4', color: '#2C221E70', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em' }}>
+                          <th style={{ padding: '0.75rem 1rem' }}>Deal Name</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>Stage</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>Tier</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>MRR</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>Setup</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deals.filter(d => d.company_id === selectedCompany.id).map(d => (
+                          <tr key={d.id} style={{ borderTop: '1px solid #E6E0D8' }}>
+                            <td style={{ padding: '1rem', fontWeight: 500 }}>{d.deal_name}</td>
+                            <td style={{ padding: '1rem' }}><span style={{ color: '#C88A65', fontWeight: 600 }}>{d.stage}</span></td>
+                            <td style={{ padding: '1rem', color: '#2C221E70' }}>{d.product_tier}</td>
+                            <td style={{ padding: '1rem', fontWeight: 600, color: '#047857' }}>£{d.mrr_value}/mo</td>
+                            <td style={{ padding: '1rem' }}>£{d.setup_value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Communication Notes & Documents */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                    <div className="card-box" style={{ margin: 0 }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <MessageSquare size={16} /> Communication Logs
+                      </h3>
+                      <form onSubmit={handleAddNote} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '1rem' }}>
+                        <select value={newNote.communication_type} onChange={e => setNewNote({...newNote, communication_type: e.target.value})}>
+                          <option value="Call">Call</option>
+                          <option value="Missed Call">Missed Call</option>
+                          <option value="Email">Email</option>
+                          <option value="WhatsApp">WhatsApp</option>
+                        </select>
+                        <textarea rows={2} placeholder="Write note..." value={newNote.content} onChange={e => setNewNote({...newNote, content: e.target.value})} required style={{ background: '#F7F4EF' }} />
+                        <button type="submit" style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer', alignSelf: 'flex-end' }}>Add Note</button>
+                      </form>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {notes.filter(n => n.company_id === selectedCompany.id).map(n => (
+                          <div key={n.id} style={{ background: '#F7F4EF', padding: '8px 10px', borderRadius: '6px', fontSize: '0.75rem' }}>
+                            <strong>{n.communication_type}</strong> ({n.date}): {n.content}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="card-box" style={{ margin: 0 }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FileText size={16} /> Associated Documents
+                      </h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {documents.filter(d => d.company_name === selectedCompany.business_name).map(doc => (
+                          <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 10px', background: '#F7F4EF', borderRadius: '6px', fontSize: '0.75rem', alignItems: 'center' }}>
+                            <span>{doc.title}</span>
+                            <button onClick={() => handleDeleteDoc(doc.id)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '2px 6px', borderRadius: '4px', fontSize: '10px' }}>Delete</button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* TAB 1: PIPELINE */}
+              {currentTab === 'pipeline' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  <div className="card-box" style={{ padding: '1.5rem' }}>
+                    <h3 style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, margin: '0 0 1rem 0' }}>Pipeline Revenue by Stage</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '10px' }}>
+                      {pipelineStages.map(stage => {
+                        const stageDeals = deals.filter(d => (d.stage || 'Prospect') === stage);
+                        const stageMrr = stageDeals.reduce((acc, d) => acc + Number(d.mrr_value || 0), 0);
+                        return (
+                          <div key={stage} style={{ background: '#F7F4EF', padding: '10px', borderRadius: '10px', textAlign: 'center', border: '1px solid #E6E0D8' }}>
+                            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: '#2C221E60', fontWeight: 600, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stage}</span>
+                            <span style={{ fontSize: '1rem', fontWeight: 600, display: 'block', margin: '4px 0 2px 0' }}>£{stageMrr}</span>
+                            <span style={{ fontSize: '10px', color: '#C88A65' }}>{stageDeals.length} deals</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="card-box" style={{ padding: 0, overflowX: 'auto' }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid #E6E0D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0 }}>Active Pipeline & Customer Deals ({deals.length})</h3>
+                      <button onClick={() => setIsDealModalOpen(true)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer' }}>
+                        Add New Deal
+                      </button>
+                    </div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem', minWidth: '550px' }}>
+                      <thead>
+                        <tr style={{ background: '#F2ECE4', color: '#2C221E70', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em' }}>
+                          <th style={{ padding: '1rem 1.5rem' }}>Company / Salon</th>
+                          <th style={{ padding: '1rem 1.5rem' }}>Deal Name</th>
+                          <th style={{ padding: '1rem 1.5rem' }}>Stage</th>
+                          <th style={{ padding: '1rem 1.5rem' }}>MRR Value</th>
+                          <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Company Profile</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deals.map((d) => {
+                          const comp = companies.find(c => c.id === d.company_id);
+                          return (
+                            <tr key={d.id} style={{ borderTop: '1px solid #E6E0D8' }}>
+                              <td style={{ padding: '1.25rem 1.5rem', fontWeight: 500 }}>{comp?.business_name || 'Unknown Company'}</td>
+                              <td style={{ padding: '1.25rem 1.5rem', color: '#2C221E70' }}>{d.deal_name}</td>
+                              <td style={{ padding: '1.25rem 1.5rem' }}>
+                                <span style={{ background: '#C88A6515', color: '#C88A65', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
+                                  {d.stage}
+                                </span>
+                              </td>
+                              <td style={{ padding: '1.25rem 1.5rem', fontWeight: 600, color: '#047857' }}>£{d.mrr_value}/mo</td>
+                              <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
+                                {comp && (
+                                  <button onClick={() => setSelectedCompany(comp)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                                    View Company
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: CONTACTS */}
+              {currentTab === 'contacts' && (
+                <div className="card-box" style={{ padding: 0, overflowX: 'auto' }}>
+                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #E6E0D8' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0 }}>Company CRM Directory ({companies.length} Salons)</h3>
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem', minWidth: '550px' }}>
                     <thead>
                       <tr style={{ background: '#F2ECE4', color: '#2C221E70', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em' }}>
-                        <th style={{ padding: '1rem 1.5rem' }}>Company / Salon</th>
-                        <th style={{ padding: '1rem 1.5rem' }}>Deal Name</th>
-                        <th style={{ padding: '1rem 1.5rem' }}>Stage</th>
-                        <th style={{ padding: '1rem 1.5rem' }}>MRR Value</th>
-                        <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Company Profile</th>
+                        <th style={{ padding: '1rem 1.5rem' }}>Business Name</th>
+                        <th style={{ padding: '1rem 1.5rem' }}>Owner / Contact</th>
+                        <th style={{ padding: '1rem 1.5rem' }}>Associated Deals Count</th>
+                        <th style={{ padding: '1rem 1.5rem' }}>Email & Phone</th>
+                        <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {deals.map((d) => {
-                        const comp = companies.find(c => c.id === d.company_id);
+                      {companies.map((comp) => {
+                        const compDeals = deals.filter(d => d.company_id === comp.id);
                         return (
-                          <tr key={d.id} style={{ borderTop: '1px solid #E6E0D8' }}>
-                            <td style={{ padding: '1.25rem 1.5rem', fontWeight: 500 }}>{comp?.business_name || 'Unknown Company'}</td>
-                            <td style={{ padding: '1.25rem 1.5rem', color: '#2C221E70' }}>{d.deal_name}</td>
-                            <td style={{ padding: '1.25rem 1.5rem' }}>
-                              <span style={{ background: '#C88A6515', color: '#C88A65', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
-                                {d.stage}
-                              </span>
+                          <tr key={comp.id} style={{ borderTop: '1px solid #E6E0D8' }}>
+                            <td style={{ padding: '1.25rem 1.5rem', fontWeight: 500 }}>{comp.business_name}</td>
+                            <td style={{ padding: '1.25rem 1.5rem' }}>{comp.contact_name}</td>
+                            <td style={{ padding: '1.25rem 1.5rem', fontWeight: 600, color: '#C88A65' }}>{compDeals.length} Deal{compDeals.length > 1 ? 's' : ''}</td>
+                            <td style={{ padding: '1.25rem 1.5rem', color: '#2C221E70', fontSize: '0.75rem' }}>
+                              <div>{comp.email}</div>
+                              <div>{comp.phone}</div>
                             </td>
-                            <td style={{ padding: '1.25rem 1.5rem', fontWeight: 600, color: '#047857' }}>£{d.mrr_value}/mo</td>
                             <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
-                              {comp && (
-                                <button onClick={() => setSelectedCompany(comp)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem' }}>
-                                  View Company
-                                </button>
-                              )}
+                              <button onClick={() => setSelectedCompany(comp)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                                Open Company Hub
+                              </button>
                             </td>
                           </tr>
                         );
@@ -740,364 +824,323 @@ export default function VannaOSMasterHubSpot() {
                     </tbody>
                   </table>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* TAB 2: CONTACTS */}
-            {currentTab === 'contacts' && (
-              <div className="card-box" style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #E6E0D8' }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0 }}>Company CRM Directory ({companies.length} Salons)</h3>
-                </div>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
-                  <thead>
-                    <tr style={{ background: '#F2ECE4', color: '#2C221E70', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em' }}>
-                      <th style={{ padding: '1rem 1.5rem' }}>Business Name</th>
-                      <th style={{ padding: '1rem 1.5rem' }}>Owner / Contact</th>
-                      <th style={{ padding: '1rem 1.5rem' }}>Associated Deals Count</th>
-                      <th style={{ padding: '1rem 1.5rem' }}>Email & Phone</th>
-                      <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {companies.map((comp) => {
-                      const compDeals = deals.filter(d => d.company_id === comp.id);
-                      return (
-                        <tr key={comp.id} style={{ borderTop: '1px solid #E6E0D8' }}>
-                          <td style={{ padding: '1.25rem 1.5rem', fontWeight: 500 }}>{comp.business_name}</td>
-                          <td style={{ padding: '1.25rem 1.5rem' }}>{comp.contact_name}</td>
-                          <td style={{ padding: '1.25rem 1.5rem', fontWeight: 600, color: '#C88A65' }}>{compDeals.length} Deal{compDeals.length > 1 ? 's' : ''}</td>
-                          <td style={{ padding: '1.25rem 1.5rem', color: '#2C221E70', fontSize: '0.75rem' }}>
-                            <div>{comp.email}</div>
-                            <div>{comp.phone}</div>
-                          </td>
-                          <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
-                            <button onClick={() => setSelectedCompany(comp)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem' }}>
-                              Open Company Hub
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* TAB 3: PRODUCTS & PRICING CATALOG (WITH EDIT & FEATURE TICKER) */}
-            {currentTab === 'products' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                  {products.map((p) => (
-                    <div key={p.id} className="card-box" style={{ margin: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                          <h4 style={{ fontSize: '1.2rem', fontWeight: 500, margin: 0 }}>{p.name}</h4>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            <button onClick={() => handleStartEditProduct(p)} style={{ background: '#C88A6520', color: '#C88A65', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Edit3 size={12} /> Edit
-                            </button>
-                            <button onClick={() => handleDeleteProduct(p.id)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', cursor: 'pointer' }}>Delete</button>
+              {/* TAB 3: PRODUCTS & PRICING CATALOG */}
+              {currentTab === 'products' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                    {products.map((p) => (
+                      <div key={p.id} className="card-box" style={{ margin: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                            <h4 style={{ fontSize: '1.2rem', fontWeight: 500, margin: 0 }}>{p.name}</h4>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button onClick={() => handleStartEditProduct(p)} style={{ background: '#C88A6520', color: '#C88A65', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Edit3 size={12} /> Edit
+                              </button>
+                              <button onClick={() => handleDeleteProduct(p.id)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', cursor: 'pointer' }}>Delete</button>
+                            </div>
+                          </div>
+                          <div style={{ fontSize: '1.6rem', fontWeight: 300, color: '#C88A65', marginBottom: '4px' }}>
+                            £{p.mrr}<span style={{ fontSize: '0.75rem', color: '#2C221E70' }}>/mo</span>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: '#2C221E60', marginBottom: '1rem' }}>
+                            Initial Setup Fee: £{p.setup_fee}
+                          </div>
+                          <p style={{ fontSize: '0.8rem', color: '#2C221E70', margin: '0 0 1rem 0' }}>{p.description}</p>
+                          
+                          <div style={{ borderTop: '1px solid #E6E0D8', paddingTop: '12px' }}>
+                            <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, color: '#C88A65', display: 'block', marginBottom: '8px' }}>Included Features ({p.features?.length || 0}):</span>
+                            <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.75rem', color: '#2C221E80', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              {p.features?.map((feat: string, i: number) => (
+                                <li key={i}>{feat}</li>
+                              ))}
+                            </ul>
                           </div>
                         </div>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 300, color: '#C88A65', marginBottom: '4px' }}>
-                          £{p.mrr}<span style={{ fontSize: '0.75rem', color: '#2C221E70' }}>/mo</span>
-                        </div>
-                        <div style={{ fontSize: '0.8rem', color: '#2C221E60', marginBottom: '1rem' }}>
-                          Initial Setup Fee: £{p.setup_fee}
-                        </div>
-                        <p style={{ fontSize: '0.8rem', color: '#2C221E70', margin: '0 0 1rem 0' }}>{p.description}</p>
-                        
-                        <div style={{ borderTop: '1px solid #E6E0D8', paddingTop: '12px' }}>
-                          <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, color: '#C88A65', display: 'block', marginBottom: '8px' }}>Included Features ({p.features?.length || 0}):</span>
-                          <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.75rem', color: '#2C221E80', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            {p.features?.map((feat: string, i: number) => (
-                              <li key={i}>{feat}</li>
-                            ))}
-                          </ul>
-                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="card-box">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, margin: 0 }}>
-                      {editingProductId ? 'Edit Product Tier' : 'Add New Product Tier & Assign Features'}
-                    </h3>
-                    {editingProductId && (
-                      <button onClick={() => { setEditingProductId(null); setNewProd({ name: '', mrr: '', setup_fee: '', description: '', features: [] }); }} style={{ background: 'none', border: 'none', color: '#2C221E70', fontSize: '0.75rem', cursor: 'pointer' }}>
-                        Cancel Editing
-                      </button>
-                    )}
+                    ))}
                   </div>
 
-                  <form onSubmit={handleSaveProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Tier Title *</label>
-                        <input type="text" placeholder="e.g. Pro Sanctuary Suite" value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} required />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Monthly Price (£) *</label>
-                        <input type="number" placeholder="149" value={newProd.mrr} onChange={e => setNewProd({...newProd, mrr: e.target.value})} required />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Setup Fee (£)</label>
-                        <input type="number" placeholder="299" value={newProd.setup_fee} onChange={e => setNewProd({...newProd, setup_fee: e.target.value})} />
-                      </div>
+                  <div className="card-box">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                      <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, margin: 0 }}>
+                        {editingProductId ? 'Edit Product Tier' : 'Add New Product Tier & Assign Features'}
+                      </h3>
+                      {editingProductId && (
+                        <button onClick={() => { setEditingProductId(null); setNewProd({ name: '', mrr: '', setup_fee: '', description: '', features: [] }); }} style={{ background: 'none', border: 'none', color: '#2C221E70', fontSize: '0.75rem', cursor: 'pointer' }}>
+                          Cancel Editing
+                        </button>
+                      )}
                     </div>
 
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Package Short Description</label>
-                      <input type="text" placeholder="Built for multi-room independent practitioners..." value={newProd.description} onChange={e => setNewProd({...newProd, description: e.target.value})} />
-                    </div>
+                    <form onSubmit={handleSaveProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Tier Title *</label>
+                          <input type="text" placeholder="e.g. Pro Sanctuary Suite" value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} required />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Monthly Price (£) *</label>
+                          <input type="number" placeholder="149" value={newProd.mrr} onChange={e => setNewProd({...newProd, mrr: e.target.value})} required />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Setup Fee (£)</label>
+                          <input type="number" placeholder="299" value={newProd.setup_fee} onChange={e => setNewProd({...newProd, setup_fee: e.target.value})} />
+                        </div>
+                      </div>
 
-                    {/* Feature Ticker Checklist */}
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', display: 'block', marginBottom: '8px' }}>
-                        Select Features to Include in this Tier ({newProd.features.length} selected):
-                      </label>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px', background: '#F7F4EF', padding: '1rem', borderRadius: '1rem', border: '1px solid #E6E0D8' }}>
-                        {masterFeatureList.map((feat) => {
-                          const isChecked = newProd.features.includes(feat);
-                          return (
-                            <div 
-                              key={feat}
-                              onClick={() => toggleFeatureSelection(feat)}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                padding: '8px 12px',
-                                background: isChecked ? '#2C221E' : '#FFFFFF',
-                                color: isChecked ? '#FFFFFF' : '#2C221E',
-                                borderRadius: '8px',
-                                border: '1px solid #E6E0D8',
-                                cursor: 'pointer',
-                                fontSize: '0.75rem',
-                                fontWeight: 500,
-                                transition: 'all 0.15s ease'
-                              }}
-                            >
-                              <div style={{ width: '14px', height: '14px', borderRadius: '4px', border: '1px solid #C88A65', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isChecked ? '#C88A65' : 'transparent' }}>
-                                {isChecked && <Check size={10} color="#FFFFFF" />}
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Package Short Description</label>
+                        <input type="text" placeholder="Built for multi-room independent practitioners..." value={newProd.description} onChange={e => setNewProd({...newProd, description: e.target.value})} />
+                      </div>
+
+                      {/* Feature Ticker Checklist */}
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', display: 'block', marginBottom: '8px' }}>
+                          Select Features to Include in this Tier ({newProd.features.length} selected):
+                        </label>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px', background: '#F7F4EF', padding: '1rem', borderRadius: '1rem', border: '1px solid #E6E0D8' }}>
+                          {masterFeatureList.map((feat) => {
+                            const isChecked = newProd.features.includes(feat);
+                            return (
+                              <div 
+                                key={feat}
+                                onClick={() => toggleFeatureSelection(feat)}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '10px',
+                                  padding: '8px 12px',
+                                  background: isChecked ? '#2C221E' : '#FFFFFF',
+                                  color: isChecked ? '#FFFFFF' : '#2C221E',
+                                  borderRadius: '8px',
+                                  border: '1px solid #E6E0D8',
+                                  cursor: 'pointer',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 500,
+                                  transition: 'all 0.15s ease'
+                                }}
+                              >
+                                <div style={{ width: '14px', height: '14px', borderRadius: '4px', border: '1px solid #C88A65', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isChecked ? '#C88A65' : 'transparent', flexShrink: 0 }}>
+                                  {isChecked && <Check size={10} color="#FFFFFF" />}
+                                </div>
+                                <span>{feat}</span>
                               </div>
-                              <span>{feat}</span>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div>
+                        <button type="submit" style={{ background: '#2C221E', color: 'white', border: 'none', borderRadius: '1rem', padding: '0.85rem 2rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer' }}>
+                          {editingProductId ? 'Update Product Tier' : 'Save & Publish Product Tier'}
+                        </button>
+                      </div>
+
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 4: CMS */}
+              {currentTab === 'cms' && (
+                <div className="card-box" style={{ maxWidth: '800px' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 400, margin: '0 0 4px 0' }}>Global Website Content CMS</h3>
+                  <p style={{ fontSize: '0.8rem', color: '#2C221E70', marginBottom: '1.5rem' }}>Edit every headline, title, description, and copy element across your public landing page.</p>
+                  
+                  <form onSubmit={handleSaveCms} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    
+                    {/* Branding */}
+                    <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#C88A65', display: 'block', marginBottom: '4px' }}>Logo Text</label>
+                        <input type="text" value={siteConfig.logoText} onChange={e => setSiteConfig({...siteConfig, logoText: e.target.value})} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#C88A65', display: 'block', marginBottom: '4px' }}>Logo Badge Tag</label>
+                        <input type="text" value={siteConfig.logoBadge} onChange={e => setSiteConfig({...siteConfig, logoBadge: e.target.value})} />
                       </div>
                     </div>
 
-                    <div>
-                      <button type="submit" style={{ background: '#2C221E', color: 'white', border: 'none', borderRadius: '1rem', padding: '0.85rem 2rem', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer' }}>
-                        {editingProductId ? 'Update Product Tier' : 'Save & Publish Product Tier'}
-                      </button>
+                    {/* Hero Section */}
+                    <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Hero Section</h4>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Hero Headline</label>
+                        <input type="text" value={siteConfig.heroHeadline} onChange={e => setSiteConfig({...siteConfig, heroHeadline: e.target.value})} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Hero Subtitle</label>
+                        <textarea rows={2} value={siteConfig.heroSubtitle} onChange={e => setSiteConfig({...siteConfig, heroSubtitle: e.target.value})} style={{ background: '#FFFFFF' }} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Hero CTA Button Text</label>
+                        <input type="text" value={siteConfig.heroCtaText} onChange={e => setSiteConfig({...siteConfig, heroCtaText: e.target.value})} />
+                      </div>
                     </div>
+
+                    {/* Sandbox Simulator Section */}
+                    <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Interactive Sandbox Section</h4>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Sandbox Header</label>
+                        <input type="text" value={siteConfig.sandboxHeader} onChange={e => setSiteConfig({...siteConfig, sandboxHeader: e.target.value})} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Sandbox Subtext</label>
+                        <textarea rows={2} value={siteConfig.sandboxSubtext} onChange={e => setSiteConfig({...siteConfig, sandboxSubtext: e.target.value})} style={{ background: '#FFFFFF' }} />
+                      </div>
+                    </div>
+
+                    {/* Features / Pillars Section */}
+                    <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Features Section</h4>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Section Header</label>
+                        <input type="text" value={siteConfig.featuresHeader} onChange={e => setSiteConfig({...siteConfig, featuresHeader: e.target.value})} />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 1 Title</label>
+                          <input type="text" value={siteConfig.feature1Title} onChange={e => setSiteConfig({...siteConfig, feature1Title: e.target.value})} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 1 Description</label>
+                          <input type="text" value={siteConfig.feature1Desc} onChange={e => setSiteConfig({...siteConfig, feature1Desc: e.target.value})} />
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 2 Title</label>
+                          <input type="text" value={siteConfig.feature2Title} onChange={e => setSiteConfig({...siteConfig, feature2Title: e.target.value})} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 2 Description</label>
+                          <input type="text" value={siteConfig.feature2Desc} onChange={e => setSiteConfig({...siteConfig, feature2Desc: e.target.value})} />
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 3 Title</label>
+                          <input type="text" value={siteConfig.feature3Title} onChange={e => setSiteConfig({...siteConfig, feature3Title: e.target.value})} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 3 Description</label>
+                          <input type="text" value={siteConfig.feature3Desc} onChange={e => setSiteConfig({...siteConfig, feature3Desc: e.target.value})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pricing & Footer */}
+                    <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Pricing & Footer</h4>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Pricing Section Header</label>
+                        <input type="text" value={siteConfig.pricingHeader} onChange={e => setSiteConfig({...siteConfig, pricingHeader: e.target.value})} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Footer Copyright Text</label>
+                        <input type="text" value={siteConfig.footerText} onChange={e => setSiteConfig({...siteConfig, footerText: e.target.value})} />
+                      </div>
+                    </div>
+
+                    <button type="submit" disabled={savingCms} style={{ background: '#2C221E', color: 'white', border: 'none', borderRadius: '1rem', padding: '1rem 2rem', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start' }}>
+                      {savingCms ? 'Publishing...' : 'Publish All Website Copy Live'}
+                    </button>
 
                   </form>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* TAB 4: CMS */}
-            {currentTab === 'cms' && (
-              <div className="card-box" style={{ maxWidth: '800px' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 400, margin: '0 0 4px 0' }}>Global Website Content CMS</h3>
-                <p style={{ fontSize: '0.8rem', color: '#2C221E70', marginBottom: '1.5rem' }}>Edit every headline, title, description, and copy element across your public landing page.</p>
-                
-                <form onSubmit={handleSaveCms} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  
-                  {/* Branding */}
-                  <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#C88A65', display: 'block', marginBottom: '4px' }}>Logo Text</label>
-                      <input type="text" value={siteConfig.logoText} onChange={e => setSiteConfig({...siteConfig, logoText: e.target.value})} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#C88A65', display: 'block', marginBottom: '4px' }}>Logo Badge Tag</label>
-                      <input type="text" value={siteConfig.logoBadge} onChange={e => setSiteConfig({...siteConfig, logoBadge: e.target.value})} />
+              {/* TAB 5: FINANCES */}
+              {currentTab === 'finances' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  <div className="card-box" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#C88A65' }}>Reporting Period: {finData.label}</span>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {[
+                        { id: 'this-month', label: 'This Month' },
+                        { id: 'last-month', label: 'Last Month' },
+                        { id: 'q3', label: 'Q3 2026' },
+                        { id: 'ytd', label: 'YTD 2026' },
+                        { id: 'all', label: 'All-Time' },
+                      ].map(f => (
+                        <button 
+                          key={f.id}
+                          onClick={() => setFinanceFilter(f.id as any)}
+                          style={{
+                            background: financeFilter === f.id ? '#2C221E' : '#F7F4EF',
+                            color: financeFilter === f.id ? '#FFFFFF' : '#2C221E',
+                            border: '1px solid #E6E0D8',
+                            padding: '6px 12px',
+                            borderRadius: '8px',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Hero Section */}
-                  <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Hero Section</h4>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Hero Headline</label>
-                      <input type="text" value={siteConfig.heroHeadline} onChange={e => setSiteConfig({...siteConfig, heroHeadline: e.target.value})} />
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+                    <div className="card-box" style={{ margin: 0 }}>
+                      <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Period MRR</span>
+                      <h3 style={{ fontSize: '2.5rem', fontWeight: 300, margin: 0 }}>£{finData.filteredMrr}</h3>
                     </div>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Hero Subtitle</label>
-                      <textarea rows={2} value={siteConfig.heroSubtitle} onChange={e => setSiteConfig({...siteConfig, heroSubtitle: e.target.value})} style={{ background: '#FFFFFF' }} />
+                    <div className="card-box" style={{ margin: 0 }}>
+                      <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Cumulative Revenue</span>
+                      <h3 style={{ fontSize: '2.5rem', fontWeight: 300, margin: 0 }}>£{finData.cumulativeRevenue}</h3>
                     </div>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Hero CTA Button Text</label>
-                      <input type="text" value={siteConfig.heroCtaText} onChange={e => setSiteConfig({...siteConfig, heroCtaText: e.target.value})} />
+                    <div className="card-box" style={{ margin: 0 }}>
+                      <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Active Customer Deals</span>
+                      <h3 style={{ fontSize: '2.5rem', fontWeight: 300, margin: 0 }}>{finData.activeCount}</h3>
                     </div>
-                  </div>
-
-                  {/* Sandbox Simulator Section */}
-                  <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Interactive Sandbox Section</h4>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Sandbox Header</label>
-                      <input type="text" value={siteConfig.sandboxHeader} onChange={e => setSiteConfig({...siteConfig, sandboxHeader: e.target.value})} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Sandbox Subtext</label>
-                      <textarea rows={2} value={siteConfig.sandboxSubtext} onChange={e => setSiteConfig({...siteConfig, sandboxSubtext: e.target.value})} style={{ background: '#FFFFFF' }} />
-                    </div>
-                  </div>
-
-                  {/* Features / Pillars Section */}
-                  <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Features Section</h4>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Section Header</label>
-                      <input type="text" value={siteConfig.featuresHeader} onChange={e => setSiteConfig({...siteConfig, featuresHeader: e.target.value})} />
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 1 Title</label>
-                        <input type="text" value={siteConfig.feature1Title} onChange={e => setSiteConfig({...siteConfig, feature1Title: e.target.value})} />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 1 Description</label>
-                        <input type="text" value={siteConfig.feature1Desc} onChange={e => setSiteConfig({...siteConfig, feature1Desc: e.target.value})} />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 2 Title</label>
-                        <input type="text" value={siteConfig.feature2Title} onChange={e => setSiteConfig({...siteConfig, feature2Title: e.target.value})} />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 2 Description</label>
-                        <input type="text" value={siteConfig.feature2Desc} onChange={e => setSiteConfig({...siteConfig, feature2Desc: e.target.value})} />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 3 Title</label>
-                        <input type="text" value={siteConfig.feature3Title} onChange={e => setSiteConfig({...siteConfig, feature3Title: e.target.value})} />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Feature 3 Description</label>
-                        <input type="text" value={siteConfig.feature3Desc} onChange={e => setSiteConfig({...siteConfig, feature3Desc: e.target.value})} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Pricing & Footer */}
-                  <div style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#C88A65', margin: 0 }}>Pricing & Footer</h4>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Pricing Section Header</label>
-                      <input type="text" value={siteConfig.pricingHeader} onChange={e => setSiteConfig({...siteConfig, pricingHeader: e.target.value})} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#2C221E70', display: 'block', marginBottom: '4px' }}>Footer Copyright Text</label>
-                      <input type="text" value={siteConfig.footerText} onChange={e => setSiteConfig({...siteConfig, footerText: e.target.value})} />
-                    </div>
-                  </div>
-
-                  <button type="submit" disabled={savingCms} style={{ background: '#2C221E', color: 'white', border: 'none', borderRadius: '1rem', padding: '1rem 2rem', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start' }}>
-                    {savingCms ? 'Publishing...' : 'Publish All Website Copy Live'}
-                  </button>
-
-                </form>
-              </div>
-            )}
-
-            {/* TAB 5: FINANCES */}
-            {currentTab === 'finances' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                <div className="card-box" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#C88A65' }}>Reporting Period: {finData.label}</span>
-                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                    {[
-                      { id: 'this-month', label: 'This Month' },
-                      { id: 'last-month', label: 'Last Month' },
-                      { id: 'q3', label: 'Q3 2026' },
-                      { id: 'ytd', label: 'YTD 2026' },
-                      { id: 'all', label: 'All-Time' },
-                    ].map(f => (
-                      <button 
-                        key={f.id}
-                        onClick={() => setFinanceFilter(f.id as any)}
-                        style={{
-                          background: financeFilter === f.id ? '#2C221E' : '#F7F4EF',
-                          color: financeFilter === f.id ? '#FFFFFF' : '#2C221E',
-                          border: '1px solid #E6E0D8',
-                          padding: '6px 12px',
-                          borderRadius: '8px',
-                          fontSize: '0.75rem',
-                          fontWeight: 500,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {f.label}
-                      </button>
-                    ))}
                   </div>
                 </div>
+              )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
-                  <div className="card-box" style={{ margin: 0 }}>
-                    <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Period MRR</span>
-                    <h3 style={{ fontSize: '2.5rem', fontWeight: 300, margin: 0 }}>£{finData.filteredMrr}</h3>
+              {/* TAB 6: CONTRACTS */}
+              {currentTab === 'contracts' && (
+                <div className="card-box">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '10px' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 500, margin: 0 }}>Signed Client Contracts & SLA Vault</h3>
+                    <button onClick={() => setIsContractModalOpen(true)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Upload size={14} /> Upload Contract
+                    </button>
                   </div>
-                  <div className="card-box" style={{ margin: 0 }}>
-                    <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Cumulative Revenue</span>
-                    <h3 style={{ fontSize: '2.5rem', fontWeight: 300, margin: 0 }}>£{finData.cumulativeRevenue}</h3>
-                  </div>
-                  <div className="card-box" style={{ margin: 0 }}>
-                    <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C88A65', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Active Customer Deals</span>
-                    <h3 style={{ fontSize: '2.5rem', fontWeight: 300, margin: 0 }}>{finData.activeCount}</h3>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 6: CONTRACTS */}
-            {currentTab === 'contracts' && (
-              <div className="card-box">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 500, margin: 0 }}>Signed Client Contracts & SLA Vault</h3>
-                  <button onClick={() => setIsContractModalOpen(true)} style={{ background: '#2C221E', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Upload size={14} /> Upload Contract
-                  </button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  {Array.from(new Set(documents.map(d => d.company_name))).map(compName => {
-                    const compDocs = documents.filter(d => d.company_name === compName);
-                    return (
-                      <div key={compName} style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8' }}>
-                        <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#C88A65', margin: '0 0 10px 0' }}>{compName} ({compDocs.length} Document{compDocs.length > 1 ? 's' : ''})</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {compDocs.map(doc => (
-                            <div key={doc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#FFFFFF', borderRadius: '8px', border: '1px solid #E6E0D8' }}>
-                              <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>{doc.title} <span style={{ fontSize: '0.7rem', color: '#2C221E60', marginLeft: '8px' }}>({doc.file_size})</span></span>
-                              <button onClick={() => handleDeleteDoc(doc.id)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Delete</button>
-                            </div>
-                          ))}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    {Array.from(new Set(documents.map(d => d.company_name))).map(compName => {
+                      const compDocs = documents.filter(d => d.company_name === compName);
+                      return (
+                        <div key={compName} style={{ background: '#F7F4EF', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #E6E0D8' }}>
+                          <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#C88A65', margin: '0 0 10px 0' }}>{compName} ({compDocs.length} Document{compDocs.length > 1 ? 's' : ''})</h4>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {compDocs.map(doc => (
+                              <div key={doc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#FFFFFF', borderRadius: '8px', border: '1px solid #E6E0D8', flexWrap: 'wrap', gap: '8px' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>{doc.title} <span style={{ fontSize: '0.7rem', color: '#2C221E60', marginLeft: '8px' }}>({doc.file_size})</span></span>
+                                <button onClick={() => handleDeleteDoc(doc.id)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Delete</button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
-          </>
-        )}
+              )}
+            </>
+          )}
 
-      </main>
+        </main>
+      </div>
 
       {/* POP-OUT MODAL FOR ADDING DEALS */}
       {isDealModalOpen && (
@@ -1132,7 +1175,7 @@ export default function VannaOSMasterHubSpot() {
                 </select>
 
                 {!dealForm.company_id && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '6px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', marginTop: '6px' }}>
                     <input type="text" placeholder="New Business Name *" value={dealForm.new_business_name} onChange={e => setDealForm({...dealForm, new_business_name: e.target.value})} required />
                     <input type="text" placeholder="Contact Person *" value={dealForm.contact_name} onChange={e => setDealForm({...dealForm, contact_name: e.target.value})} required />
                   </div>
